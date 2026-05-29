@@ -9,7 +9,7 @@ export interface DesignSession {
 
 export interface UploadedPhoto {
   id: string;
-  file: File;
+  file: File | null;
   previewUrl: string;
   base64: string;
 }

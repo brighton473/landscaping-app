@@ -2,10 +2,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AddressStep from "@/components/steps/AddressStep";
-import PhotoUploadStep from "@/components/steps/PhotoUploadStep";
 import type { DesignSession } from "@/lib/types";
 
-const STEPS = ["Address", "Photos", "Design"];
+const STEPS = ["Property", "Design"];
 
 const defaultSession: DesignSession = {
   address: "",
@@ -36,7 +35,6 @@ export default function Home() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
-      {/* Step indicator */}
       <div className="flex items-center justify-center mb-10 gap-2">
         {STEPS.map((label, i) => (
           <div key={label} className="flex items-center gap-2">
@@ -54,19 +52,13 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Step content */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         {step === 0 && (
           <AddressStep
             address={session.address}
             coordinates={session.coordinates}
             onChange={(address, coordinates) => update({ address, coordinates })}
-          />
-        )}
-        {step === 1 && (
-          <PhotoUploadStep
-            photos={session.photos}
-            onChange={(photos) => update({ photos })}
+            onPhotoChange={(photo) => update({ photos: photo ? [photo] : [] })}
           />
         )}
 
@@ -79,8 +71,7 @@ export default function Home() {
           <button
             onClick={next}
             disabled={
-              (step === 0 && !session.address) ||
-              (step === 1 && session.photos.length === 0)
+              (step === 0 && (!session.address || session.photos.length === 0))
             }
             className="px-6 py-2 rounded-lg bg-primary-600 text-white font-medium hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
