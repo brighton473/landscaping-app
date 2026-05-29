@@ -20,6 +20,7 @@ export default function AddressStep({ address, coordinates, onChange, onPhotoCha
   const [fetchingPhoto, setFetchingPhoto] = useState(false);
   const [useUpload, setUseUpload] = useState(false);
   const [streetViewPhoto, setStreetViewPhoto] = useState<UploadedPhoto | null>(null);
+  const [uploadedPhoto, setUploadedPhoto] = useState<UploadedPhoto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function AddressStep({ address, coordinates, onChange, onPhotoCha
     fetch(`/api/streetview?lat=${coordinates.lat}&lng=${coordinates.lng}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.error) { setStreetViewStatus("unavailable"); return; }
+        if (data.error) { setStreetViewStatus("unavailable"); setUseUpload(true); return; }
         const photo: UploadedPhoto = {
           id: crypto.randomUUID(),
           file: null,
@@ -71,7 +72,7 @@ export default function AddressStep({ address, coordinates, onChange, onPhotoCha
         setStreetViewPhoto(photo);
         onPhotoChange(photo);
       })
-      .catch(() => setStreetViewStatus("unavailable"))
+      .catch(() => { setStreetViewStatus("unavailable"); setUseUpload(true); })
       .finally(() => setFetchingPhoto(false));
   }, [streetViewStatus, coordinates]);
 
@@ -109,6 +110,7 @@ export default function AddressStep({ address, coordinates, onChange, onPhotoCha
         previewUrl: dataUrl,
         base64: dataUrl.split(",")[1],
       };
+      setUploadedPhoto(photo);
       onPhotoChange(photo);
     };
     reader.readAsDataURL(file);
@@ -181,17 +183,29 @@ export default function AddressStep({ address, coordinates, onChange, onPhotoCha
               </button>
             )}
           </div>
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center gap-2 cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors"
-          >
-            <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M12 16v-8m-4 4l4-4 4 4M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1" />
-            </svg>
-            <p className="text-sm font-medium text-gray-600">Click to upload</p>
-            <p className="text-xs text-gray-400">JPG, PNG, WEBP</p>
-          </div>
+          {uploadedPhoto ? (
+            <div className="relative w-full h-64 rounded-xl overflow-hidden border border-gray-200">
+              <img src={uploadedPhoto.previewUrl} alt="Uploaded home" className="w-full h-full object-cover" />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-3 right-3 bg-white text-sm font-medium text-gray-700 px-3 py-1.5 rounded-lg shadow hover:bg-gray-50"
+              >
+                Change photo
+              </button>
+            </div>
+          ) : (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center gap-2 cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors"
+            >
+              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M12 16v-8m-4 4l4-4 4 4M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1" />
+              </svg>
+              <p className="text-sm font-medium text-gray-600">Click to upload</p>
+              <p className="text-xs text-gray-400">JPG, PNG, WEBP</p>
+            </div>
+          )}
           <input
             ref={fileInputRef}
             type="file"
