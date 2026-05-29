@@ -1,7 +1,18 @@
+export interface Annotation {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label: string;
+  color: string;
+}
+
 export interface DesignSession {
   address: string;
   coordinates: { lat: number; lng: number } | null;
   photos: UploadedPhoto[];
+  annotations: Annotation[];
   description: string;
   variations: DesignVariation[];
   selectedVariation: DesignVariation | null;

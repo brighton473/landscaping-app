@@ -99,11 +99,25 @@ export default function DesignStep({ session, onUpdate }: Props) {
         </div>
       </div>
 
+      {/* Annotations summary */}
+      {session.annotations?.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-gray-700">Your marked changes:</p>
+          {session.annotations.map((ann, i) => (
+            <div key={ann.id} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+              <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: ann.color }} />
+              <span className="text-xs text-gray-400">{i + 1}</span>
+              <p className="text-sm">{ann.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Description input */}
       {(phase === "describe" || phase === "selected") && (
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700">
-            Describe what you want changed
+            Any additional details?
           </label>
           <textarea
             value={description}

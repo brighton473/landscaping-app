@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import AddressStep from "@/components/steps/AddressStep";
 import type { DesignSession } from "@/lib/types";
 
-const STEPS = ["Property", "Design"];
+const STEPS = ["Property"];
 
 const defaultSession: DesignSession = {
   address: "",
   coordinates: null,
   photos: [],
+  annotations: [],
   description: "",
   variations: [],
   selectedVariation: null,
@@ -26,7 +27,10 @@ export default function Home() {
 
   function next() {
     if (step < STEPS.length - 1) setStep((s) => s + 1);
-    else router.push(`/design?session=${encodeURIComponent(JSON.stringify(session))}`);
+    else {
+      sessionStorage.setItem("landscaping_session", JSON.stringify(session));
+      router.push("/design");
+    }
   }
 
   function back() {
@@ -75,7 +79,7 @@ export default function Home() {
             }
             className="px-6 py-2 rounded-lg bg-primary-600 text-white font-medium hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {step === STEPS.length - 2 ? "Start Designing" : "Continue"}
+            {step === STEPS.length - 1 ? "Start Designing" : "Continue"}
           </button>
         </div>
       </div>
